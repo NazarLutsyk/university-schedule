@@ -1,0 +1,18 @@
+{
+  "name": "university-schedule",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "bun run ./src/index.ts --watch",
+    "start": "bun run src/index.ts",
+    "fetch": "bun run src/fetch.ts"
+  },
+  "dependencies":{"googleapis":"^144.0.0","node-telegram-bot-api":"^0.66.0"},
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}
