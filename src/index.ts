@@ -84,6 +84,7 @@ async function main(): Promise<void> {
   if (isSunday) {
     const week = getFullWeek(allEntries);
     await sendMessage(formatFullWeek(week, resourcesMap), botToken, chatId);
+
     const mondayEntries = getDaySchedule(allEntries, PONEDILOK);
     await sendMessage(
       formatDaySchedule(mondayEntries, PONEDILOK, resourcesMap),
@@ -93,6 +94,10 @@ async function main(): Promise<void> {
     console.log("Sent full week + Monday schedule to Telegram.");
   } else {
     const tomorrowName = getTomorrowDayName(now);
+    if (tomorrowName === "Субота" || tomorrowName === "Неділя") {
+      console.log("No daily notification for Saturday or Sunday (holidays).");
+      return;
+    }
     const dayEntries = getDaySchedule(allEntries, tomorrowName);
     await sendMessage(
       formatDaySchedule(dayEntries, tomorrowName, resourcesMap),

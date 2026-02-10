@@ -50,31 +50,48 @@ function formatEntry(
   return lines.join("\n");
 }
 
+/** Weekday order for full-week schedule (Monday through Friday only; Saturday is not shown). */
+const WEEKDAY_ORDER = [
+  "Понеділок",
+  "Вівторок",
+  "Середа",
+  "Четвер",
+  "П'ятниця",
+];
+
 /**
- * Format entries for "full week": grouped by day.
+ * Format entries for "full week": all weekdays in order, with "Пар немає" for days that have no entries.
  */
 export function formatFullWeek(
   entries: ScheduleEntry[],
   resourcesMap: Map<string, TeacherResources> | null = null,
 ): string {
-  if (entries.length === 0) {
-    return "Розклад порожній.";
-  }
   const lines: string[] = ["<b>Розклад на тиждень (група 231)</b>"];
-  let lastDay = "";
+  const byDay = new Map<string, ScheduleEntry[]>();
   for (const e of entries) {
-    if (e.day !== lastDay) {
-      lastDay = e.day;
-      lines.push(`\n<b>${escapeHtml(e.day)}</b> ${escapeHtml(e.date)}`);
+    const list = byDay.get(e.day) ?? [];
+    list.push(e);
+    byDay.set(e.day, list);
+  }
+  for (const dayName of WEEKDAY_ORDER) {
+    const dayEntries = byDay.get(dayName) ?? [];
+    const date = dayEntries[0]?.date ?? "";
+    const dateStr = date ? ` ${escapeHtml(date)}` : "";
+    lines.push(`\n<b>${escapeHtml(dayName)}</b>${dateStr}`);
+    if (dayEntries.length === 0) {
+      lines.push("Пар немає.");
+    } else {
+      for (const e of dayEntries) {
+        lines.push(formatEntry(e, resourcesMap));
+      }
     }
-    lines.push(formatEntry(e, resourcesMap));
   }
   return lines.join("\n\n").trim();
 }
 
 /**
  * Format entries for a single day (e.g. "Понеділок").
- * Used for both "today" and "tomorrow" when sending one day's schedule.
+ * When empty, returns "Пар немає" so we still send something.
  */
 export function formatDaySchedule(
   entries: ScheduleEntry[],
@@ -82,12 +99,12 @@ export function formatDaySchedule(
   resourcesMap: Map<string, TeacherResources> | null = null,
 ): string {
   if (entries.length === 0) {
-    return `На ${escapeHtml(dayName)} пар немає.`;
+    return `<b>${escapeHtml(dayName)}</b>\nПар немає.`;
   }
 
   const date = entries[0]?.date ?? "";
   const lines: string[] = [
-    `<b>Розклад на ${escapeHtml(dayName)}</b> ${escapeHtml(date)}\n`,
+    `<b>${escapeHtml(dayName)}</b> ${escapeHtml(date)}\n`,
   ];
 
   for (const e of entries) {
