@@ -1,19 +1,21 @@
 /**
- * University schedule monitor: fetch schedule for group 231, send via Telegram.
+ * University schedule monitor: fetch schedule for the configured course/group, send via Telegram.
  * - Sunday 20:00: full week + Monday's schedule.
  * - Mon–Sat 17:00: schedule for the next day.
  */
 
-import { getSheetList, findNewest3kSheet, getSheetValues } from "./sheets";
-import { findGroup231Columns, parseSchedule } from "./parse";
+import { getSheetList, findNewestCourseSheet, getSheetValues } from "./sheets";
+import { findGroupColumns, parseSchedule } from "./parse";
 import { getFullWeek, getDaySchedule, getTomorrowDayName } from "./schedule";
 import { formatFullWeek, formatDaySchedule } from "./format";
 import { sendMessage } from "./telegram";
 import { loadTeacherResources } from "./resources";
-
-const DEFAULT_SPREADSHEET_ID = "1n3k33vhPE5hlYANR8hOTtw2zKrSjgZuJLlNGa_7mw8s";
-const DEFAULT_RESOURCES_SPREADSHEET_ID =
-  "1hPzp1MSQYezILtq49GuxiqKUssKsDQ9Tx_tUI6NIPjk";
+import {
+  COURSE,
+  GROUP,
+  SPREADSHEET_ID,
+  RESOURCES_SPREADSHEET_ID,
+} from "./config";
 
 const PONEDILOK = "Понеділок";
 
@@ -21,9 +23,8 @@ async function main(): Promise<void> {
   const apiKey = process.env.GOOGLE_SHEETS_API_KEY;
   const botToken = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
-  const spreadsheetId = process.env.SPREADSHEET_ID ?? DEFAULT_SPREADSHEET_ID;
-  const resourcesSpreadsheetId =
-    process.env.RESOURCES_SPREADSHEET_ID ?? DEFAULT_RESOURCES_SPREADSHEET_ID;
+  const spreadsheetId = SPREADSHEET_ID;
+  const resourcesSpreadsheetId = RESOURCES_SPREADSHEET_ID;
 
   if (!apiKey) {
     console.error("Missing GOOGLE_SHEETS_API_KEY");
@@ -35,12 +36,12 @@ async function main(): Promise<void> {
   }
 
   const sheets = await getSheetList(spreadsheetId, apiKey);
-  const sheet = findNewest3kSheet(sheets);
+  const sheet = findNewestCourseSheet(sheets, COURSE);
 
   if (!sheet) {
-    console.error("No sheet matching '3к DD.MM-DD.MM.YY' found.");
+    console.error(`No sheet matching '${COURSE}к DD.MM-DD.MM.YY' found.`);
     await sendMessage(
-      "Розклад не знайдено (немає аркуша 3к з датою).",
+      `Розклад не знайдено (немає аркуша ${COURSE}к з датою).`,
       botToken,
       chatId,
     );
@@ -53,12 +54,14 @@ async function main(): Promise<void> {
     "A1:Z500",
     apiKey,
   );
-  const cols = findGroup231Columns(rows);
+  const cols = findGroupColumns(rows, GROUP);
 
   if (!cols) {
-    console.error("Group 231 'Комп'ютерні науки' column not found in sheet.");
+    console.error(
+      `Group ${GROUP} 'Комп'ютерні науки' column not found in sheet.`,
+    );
     await sendMessage(
-      "Розклад не знайдено (група 231 не знайдена).",
+      `Розклад не знайдено (група ${GROUP} не знайдена).`,
       botToken,
       chatId,
     );

@@ -1,11 +1,11 @@
 name: Scheduled jobs
 
 on:
-  #schedule:
+  schedule:
     # Sunday at 20:00 UTC
-    #- cron: '0 18 * * 0'
+    - cron: '0 18 * * 0'
     # Monday–Friday at 15:00 UTC
-    #- cron: '0 15 * * 1-5'
+    - cron: '0 15 * * 1-5'
   workflow_dispatch: # Allow manual run
 
 jobs:

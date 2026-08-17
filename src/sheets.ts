@@ -1,5 +1,5 @@
 /**
- * Google Sheets access via googleapis: list sheets, find newest "3к" tab, get values.
+ * Google Sheets access via googleapis: list sheets, find newest course tab, get values.
  * Uses API key only (public sheet).
  */
 
@@ -31,17 +31,24 @@ export async function getSheetList(
   }));
 }
 
-const TITLE_3K_REGEX = /3к\s+(\d{2})\.(\d{2})-(\d{2})\.(\d{2})\.(\d{2})/;
+/** Tab titles look like "  4к 17.08-22.08.26" (Cyrillic "к"); spacing is inconsistent. */
+function titleRegex(course: string): RegExp {
+  return new RegExp(`${course}к\\s*(\\d{2})\\.(\\d{2})-(\\d{2})\\.(\\d{2})\\.(\\d{2})`);
+}
 
 /**
- * From sheet titles, pick the one matching "3к DD.MM-DD.MM.YY" with the newest end date.
+ * From sheet titles, pick the one matching "<course>к DD.MM-DD.MM.YY" with the newest end date.
  */
-export function findNewest3kSheet(titles: SheetInfo[]): SheetInfo | null {
+export function findNewestCourseSheet(
+  titles: SheetInfo[],
+  course: string,
+): SheetInfo | null {
+  const regex = titleRegex(course);
   let best: SheetInfo | null = null;
   let bestEnd = 0;
 
   for (const s of titles) {
-    const m = s.title.match(TITLE_3K_REGEX);
+    const m = s.title.match(regex);
 
     const endD = m?.[3];
     const endM = m?.[4];

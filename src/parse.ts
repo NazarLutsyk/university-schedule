@@ -1,5 +1,5 @@
 /**
- * Parse schedule sheet: find group 231 columns and extract entries.
+ * Parse schedule sheet: find the group's columns and extract entries.
  */
 
 export type ScheduleEntry = {
@@ -28,10 +28,13 @@ const HEADER_SCAN_ROWS = 15;
 const TIME_SLOT_REGEX = /\d{1,2}:\d{2}/;
 
 /**
- * Find column indices for group 231 "Комп'ютерні науки".
- * Scans header cells for a cell containing both "231" and "Комп'ютерні науки".
+ * Find column indices for the given group's "Комп'ютерні науки" block.
+ * Scans header cells for a cell containing both the group code and "Комп'ютерні науки".
  */
-export function findGroup231Columns(rows: string[][]): {
+export function findGroupColumns(
+  rows: string[][],
+  group: string,
+): {
   subjectCol: number;
   typeCol: number;
   roomCol: number;
@@ -43,7 +46,7 @@ export function findGroup231Columns(rows: string[][]): {
     for (let c = 0; c < row.length; c++) {
       const cell = (row[c] ?? "").trim();
 
-      if (cell.includes("231") && cell.includes("Комп'ютерні науки")) {
+      if (cell.includes(group) && cell.includes("Комп'ютерні науки")) {
         return {
           subjectCol: c,
           typeCol: c + 1,
@@ -87,7 +90,7 @@ export function extractTeacherLastName(subject: string): string | undefined {
 }
 
 /**
- * Parse all schedule entries for group 231 from sheet rows.
+ * Parse all schedule entries for the group's columns from sheet rows.
  * Data rows have: col0 = day (or empty), col1 = date (or empty), col2 = time; then triplets per group.
  * We carry day/date forward and use time from col2 when present.
  */

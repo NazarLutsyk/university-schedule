@@ -4,6 +4,7 @@
 
 import type { ScheduleEntry } from "./parse";
 import type { TeacherResources } from "./resources";
+import { GROUP } from "./config";
 
 function escapeHtml(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -65,8 +66,11 @@ const WEEKDAY_ORDER = [
 export function formatFullWeek(
   entries: ScheduleEntry[],
   resourcesMap: Map<string, TeacherResources> | null = null,
+  group: string = GROUP,
 ): string {
-  const lines: string[] = ["<b>Розклад на тиждень (група 231)</b>"];
+  const lines: string[] = [
+    `<b>Розклад на тиждень (група ${escapeHtml(group)})</b>`,
+  ];
   const byDay = new Map<string, ScheduleEntry[]>();
   for (const e of entries) {
     const list = byDay.get(e.day) ?? [];

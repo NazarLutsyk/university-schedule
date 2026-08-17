@@ -1,6 +1,6 @@
 # university-schedule
 
-Fetches the Lviv university schedule from Google Sheets (tab "3к" with the newest date), extracts the schedule for **група 231 он "Комп'ютерні науки"**, and sends it via Telegram. Each lesson is enriched with the teacher’s **Zoom** (URL, ID, code) and **Google Meet** link from a separate resources spreadsheet (tab "ЛЕКЦІЇ та ПРАКТИЧНІ!"); schedule teacher names (e.g. "ст.викл. Вітвіновський В.В.") are matched to resources by last name (e.g. "Вітвіновський Володимир Володимирович").
+Fetches the Lviv university schedule from Google Sheets (tab `<COURSE>к` with the newest date, e.g. " 4к 17.08-22.08.26"), extracts the schedule for **група `<GROUP>` он "Комп'ютерні науки"**, and sends it via Telegram. Course and group are set with the `COURSE` / `GROUP` env vars and default to `4` / `241`. Each lesson is enriched with the teacher’s **Zoom** (URL, ID, code) and **Google Meet** link from a separate resources spreadsheet (tab "ЛЕКЦІЇ та ПРАКТИЧНІ!"); schedule teacher names (e.g. "ст.викл. Вітвіновський В.В.") are matched to resources by last name (e.g. "Вітвіновський Володимир Володимирович").
 
 - **Sunday 20:00** — full week schedule, then Monday’s schedule.
 - **Mon–Sat 17:00** — schedule for the **next** day (e.g. Monday 17:00 sends Tuesday’s schedule).
@@ -21,7 +21,7 @@ Fetches the Lviv university schedule from Google Sheets (tab "3к" with the newe
    - `TELEGRAM_BOT_TOKEN` — from [@BotFather](https://t.me/BotFather).
    - `TELEGRAM_CHAT_ID` — your chat ID (e.g. from `getUpdates` after messaging the bot).
 
-   Optional: `SPREADSHEET_ID` (schedule), `RESOURCES_SPREADSHEET_ID` (Zoom/Meet links; defaults to [Навчальні ресурси ЄУ](https://docs.google.com/spreadsheets/d/1hPzp1MSQYezILtq49GuxiqKUssKsDQ9Tx_tUI6NIPjk/)).
+   Optional: `COURSE` (default `4`), `GROUP` (default `241`), `SPREADSHEET_ID` (schedule), `RESOURCES_SPREADSHEET_ID` (Zoom/Meet links; defaults to [Навчальні ресурси ЄУ](https://docs.google.com/spreadsheets/d/1eSHyaPKkPkJrVk7lcFLFWwlRIYrwcaU8m0oz-TsChNg/)).
 
 3. **Run**
 
@@ -50,5 +50,5 @@ Fetches the Lviv university schedule from Google Sheets (tab "3к" with the newe
 ## Scripts
 
 - `bun run start` — fetch schedule; if Sunday send full week then Monday, else send tomorrow’s schedule; send to Telegram.
-- `bun run fetch` — fetch and print parsed schedule for group 231 (no Telegram).
+- `bun run fetch` — fetch and print parsed schedule for the configured group (no Telegram).
 - `bun run dev` — run `src/index.ts` with watch.

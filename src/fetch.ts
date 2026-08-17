@@ -1,17 +1,16 @@
 /**
- * One-off fetch and parse test: print schedule for group 231 to stdout.
+ * One-off fetch and parse test: print schedule for the configured course/group to stdout.
  * Usage: bun run fetch
  */
 
-import { getSheetList, findNewest3kSheet, getSheetValues } from "./sheets";
-import { findGroup231Columns, parseSchedule } from "./parse";
+import { getSheetList, findNewestCourseSheet, getSheetValues } from "./sheets";
+import { findGroupColumns, parseSchedule } from "./parse";
 import { formatFullWeek } from "./format";
-
-const DEFAULT_SPREADSHEET_ID = "1n3k33vhPE5hlYANR8hOTtw2zKrSjgZuJLlNGa_7mw8s";
+import { COURSE, GROUP, SPREADSHEET_ID } from "./config";
 
 async function main(): Promise<void> {
   const apiKey = process.env.GOOGLE_SHEETS_API_KEY;
-  const spreadsheetId = process.env.SPREADSHEET_ID ?? DEFAULT_SPREADSHEET_ID;
+  const spreadsheetId = SPREADSHEET_ID;
 
   if (!apiKey) {
     console.error("Set GOOGLE_SHEETS_API_KEY to run fetch.");
@@ -20,20 +19,20 @@ async function main(): Promise<void> {
 
   const sheets = await getSheetList(spreadsheetId, apiKey);
   console.log("Sheets:", sheets.length);
-  const sheet = findNewest3kSheet(sheets);
+  const sheet = findNewestCourseSheet(sheets, COURSE);
   if (!sheet) {
-    console.error("No '3к' sheet found.");
+    console.error(`No '${COURSE}к' sheet found.`);
     process.exit(1);
   }
   console.log("Using sheet:", sheet.title);
 
   const rows = await getSheetValues(spreadsheetId, sheet.title, "A1:Z500", apiKey);
-  const cols = findGroup231Columns(rows);
+  const cols = findGroupColumns(rows, GROUP);
   if (!cols) {
-    console.error("Group 231 columns not found.");
+    console.error(`Group ${GROUP} columns not found.`);
     process.exit(1);
   }
-  console.log("Group 231 columns:", cols);
+  console.log(`Group ${GROUP} columns:`, cols);
 
   const entries = parseSchedule(rows, cols);
   console.log("Entries:", entries.length);
