@@ -11,6 +11,15 @@ export function getFullWeek(entries: ScheduleEntry[]): ScheduleEntry[] {
   return entries;
 }
 
+/** Weekdays we schedule for, in order (Saturday and Sunday are not taught). */
+export const WEEKDAY_ORDER = [
+  "Понеділок",
+  "Вівторок",
+  "Середа",
+  "Четвер",
+  "П'ятниця",
+];
+
 /** Ukrainian day names in order Sunday=0 .. Saturday=6 for mapping from JS getDay(). */
 const UA_DAY_NAMES: string[] = [
   "Неділя",

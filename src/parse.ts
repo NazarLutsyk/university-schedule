@@ -137,3 +137,17 @@ export function parseSchedule(
 
   return entries;
 }
+
+/**
+ * Map day name -> raw date cell for every day in the sheet, including days with
+ * no lessons. Calendar sync needs those so an emptied day still gets cleared.
+ */
+export function parseDayDates(rows: string[][]): Map<string, string> {
+  const map = new Map<string, string>();
+  for (const row of rows) {
+    if (!row) continue;
+    const day = getCell(row, 0);
+    if (DAY_NAMES.has(day)) map.set(day, getCell(row, 1));
+  }
+  return map;
+}

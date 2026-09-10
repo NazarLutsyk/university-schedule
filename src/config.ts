@@ -15,3 +15,9 @@ export const SPREADSHEET_ID =
 export const RESOURCES_SPREADSHEET_ID =
   process.env.RESOURCES_SPREADSHEET_ID ??
   "1eSHyaPKkPkJrVk7lcFLFWwlRIYrwcaU8m0oz-TsChNg";
+
+/** Dedicated Google Calendar to write the schedule into. Empty disables calendar sync. */
+export const CALENDAR_ID = process.env.CALENDAR_ID ?? "";
+
+/** Time zone the lesson times are given in. */
+export const TIME_ZONE = process.env.TIME_ZONE ?? "Europe/Kyiv";

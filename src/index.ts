@@ -5,11 +5,17 @@
  */
 
 import { getSheetList, findNewestCourseSheet, getSheetValues } from "./sheets";
-import { findGroupColumns, parseSchedule } from "./parse";
-import { getFullWeek, getDaySchedule, getTomorrowDayName } from "./schedule";
+import { findGroupColumns, parseSchedule, parseDayDates } from "./parse";
+import {
+  getFullWeek,
+  getDaySchedule,
+  getTomorrowDayName,
+  WEEKDAY_ORDER,
+} from "./schedule";
 import { formatFullWeek, formatDaySchedule } from "./format";
 import { sendMessage } from "./telegram";
 import { loadTeacherResources } from "./resources";
+import { syncDays } from "./calendar";
 import {
   COURSE,
   GROUP,
@@ -69,6 +75,7 @@ async function main(): Promise<void> {
   }
 
   const allEntries = parseSchedule(rows, cols);
+  const dayDates = parseDayDates(rows);
   
   let resourcesMap: Awaited<ReturnType<typeof loadTeacherResources>> | null =
     null;
@@ -95,6 +102,8 @@ async function main(): Promise<void> {
       chatId,
     );
     console.log("Sent full week + Monday schedule to Telegram.");
+
+    await syncDays(WEEKDAY_ORDER, allEntries, dayDates, resourcesMap);
   } else {
     const tomorrowName = getTomorrowDayName(now);
     if (tomorrowName === "Субота" || tomorrowName === "Неділя") {
@@ -108,6 +117,8 @@ async function main(): Promise<void> {
       chatId,
     );
     console.log(`Sent schedule for ${tomorrowName} to Telegram.`);
+
+    await syncDays([tomorrowName], allEntries, dayDates, resourcesMap);
   }
 }
 

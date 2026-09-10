@@ -5,6 +5,7 @@
 import type { ScheduleEntry } from "./parse";
 import type { TeacherResources } from "./resources";
 import { GROUP } from "./config";
+import { WEEKDAY_ORDER } from "./schedule";
 
 function escapeHtml(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -50,15 +51,6 @@ function formatEntry(
   }
   return lines.join("\n");
 }
-
-/** Weekday order for full-week schedule (Monday through Friday only; Saturday is not shown). */
-const WEEKDAY_ORDER = [
-  "Понеділок",
-  "Вівторок",
-  "Середа",
-  "Четвер",
-  "П'ятниця",
-];
 
 /**
  * Format entries for "full week": all weekdays in order, with "Пар немає" for days that have no entries.
